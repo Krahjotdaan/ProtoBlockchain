@@ -1,4 +1,5 @@
 from hashlib import sha256
+from copy import deepcopy
 import time
 
 
@@ -12,6 +13,7 @@ class Block:
         self.timestamp = time.time()
         self.hash = None
         self.merkle_tree_root = None
+
     @property
     def block_hash_calculation(self, difficulty=4):
         for nonce in range(10 ** 100):
@@ -27,8 +29,16 @@ class Block:
 
     @property
     def merkle_tree_building(self):
-        pass
-
+        trs = deepcopy(self.data)
+        while len(trs) > 1:
+            if len(trs) % 2 == 1:
+                trs.append(trs[len(trs) - 1])
+            for i in range(0, len(trs), 2):
+                trs[i] = sha256(trs[i].encode()).hexdigest() + \
+                sha256(trs[i + 1].encode()).hexdigest()
+            trs = list(filter(lambda x: (x.index % 2 == 0), trs))
+        self.merkle_tree_root = trs[0]
+                
     def info(self):
         print(f'index: {self.index}')
         print(f'nonce: {self.nonce}')
