@@ -5,9 +5,9 @@ import time
 
 class Block:
 
-    def __init__(self, index, prev_hash, data):
+    def __init__(self, index, nonce, prev_hash, data):
         self.index = index 
-        self.nonce = None 
+        self.nonce = nonce 
         self.prev_hash = prev_hash
         self.data = data
         self.timestamp = time.time()
@@ -24,15 +24,22 @@ class Block:
 
     @property
     def merkle_tree_building(self):
-        trs = deepcopy(self.data)
-        while len(trs) > 1:
-            if len(trs) % 2 == 1:
-                trs.append(trs[-1])
-            for i in range(0, len(trs), 2):
-                trs[i] = sha256(trs[i].encode()).hexdigest() + \
-                sha256(trs[i + 1].encode()).hexdigest()
-            trs = list(filter(lambda x: (x.index % 2 == 0), trs))
-        self.merkle_tree_root = trs[0]
+        try:
+            trs = deepcopy(self.data)
+            for tr in trs:
+                tr = ''.join((tr['sender'], 
+                             tr['recipient'], 
+                             str(tr['quantity'])),)
+            while len(trs) > 1:
+                if len(trs) % 2 == 1:
+                    trs.append(trs[-1])
+                for i in range(0, len(trs), 2):
+                    trs[i] = sha256(trs[i].encode()).hexdigest() + \
+                    sha256(trs[i + 1].encode()).hexdigest()
+                trs = list(filter(lambda x: (x.index % 2 == 0), trs))
+            self.merkle_tree_root = trs[0]
+        except IndexError:
+            self.merkle_tree_root = None
 
     @staticmethod
     def validation(block, prev_block):
@@ -47,6 +54,15 @@ class Block:
             return False
 
         return True
+
+    def __repr__(self):
+        return "{} - {} - {} - {} - {} - {}".format(
+                                                self.index, 
+                                                self.nonce,
+                                                self.hash,
+                                                self.prev_hash, 
+                                                self.merkle_tree_root,
+                                                self.timestamp)
                 
     def info(self):
         print(f'index: {self.index}')
@@ -69,11 +85,13 @@ class BlockChain:
     def construct_block(self, nonce, prev_hash):
         block = Block(len(self.blockchain), nonce, prev_hash, self.current_data)
         self.current_data = []
+        block.block_hash_calculation
+        block.merkle_tree_building
         self.blockchain.append(block)
 
         return block
     
-    def new_data(self, sender, recipient, quantity):
+    def new_transaction(self, sender, recipient, quantity):
         self.current_data.append({
             'sender': sender,
             'recipient': recipient,
@@ -98,8 +116,7 @@ class BlockChain:
         return self.blockchain[-1]
     
     def block_mining(self, details_miner):
-
-        self.new_data(
+        self.new_transaction(
             sender="0",
             receiver=details_miner,
             quantity=1, 
@@ -117,4 +134,3 @@ class BlockChain:
     
     def create_node(self, address):
         self.nodes.add(address)
-        
