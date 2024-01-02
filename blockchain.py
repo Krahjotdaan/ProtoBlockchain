@@ -26,17 +26,18 @@ class Block:
     def merkle_tree_building(self):
         try:
             trs = deepcopy(self.data)
-            for tr in trs:
-                tr = ''.join((tr['sender'], 
-                             tr['recipient'], 
-                             str(tr['quantity'])),)
+            for i in range(len(trs)):
+                trs[i] = ''.join((trs[i]['sender'], 
+                             trs[i]['recipient'], 
+                             str(trs[i]['quantity'])),)
+            if len(trs) % 2 == 1:
+                trs.append(trs[-1])    
             while len(trs) > 1:
-                if len(trs) % 2 == 1:
-                    trs.append(trs[-1])
                 for i in range(0, len(trs), 2):
                     trs[i] = sha256(trs[i].encode()).hexdigest() + \
                     sha256(trs[i + 1].encode()).hexdigest()
-                trs = list(filter(lambda x: (x.index % 2 == 0), trs))
+                    trs[i] = sha256(trs[i].encode()).hexdigest()
+                del trs[1::2]
             self.merkle_tree_root = trs[0]
         except IndexError:
             self.merkle_tree_root = None

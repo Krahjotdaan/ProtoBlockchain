@@ -4,23 +4,22 @@ from blockchain import *
 def main():
     blockchain = BlockChain()
     blockchain.construct_genesis()
-    print("***Mining fccCoin about to start***")
+    print("Start of mining")
     print(blockchain.blockchain)
 
     last_block = blockchain.last_block
-    last_proof_no = last_block.nonce
-    proof_no = blockchain.proof_of_work(last_proof_no)
+    last_nonce = last_block.nonce
+    nonce = blockchain.proof_of_work(last_nonce)
 
     blockchain.new_transaction(
-        sender="0",  #it implies that this node has created a new block
-        recipient="Quincy Larson",  #let's send Quincy some coins!
-        quantity=
-        1,  #creating a new block (or identifying the proof number) is awarded with 1
+        sender="0", 
+        recipient="Quincy Larson",  
+        quantity=1,  
     )
 
-    block = blockchain.construct_block(proof_no, last_block.hash)
+    block = blockchain.construct_block(nonce, last_block.hash)
 
-    print("***Mining fccCoin has been successful***")
+    print("***Mining was successful***")
     print(blockchain.blockchain)
 
 
