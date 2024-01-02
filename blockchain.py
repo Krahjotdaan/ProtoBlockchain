@@ -64,13 +64,6 @@ class Block:
                                                 self.prev_hash, 
                                                 self.merkle_tree_root,
                                                 self.timestamp)
-                
-    def info(self):
-        print(f'index: {self.index}')
-        print(f'nonce: {self.nonce}')
-        print(f'hash: {self.hash}')
-        print(f'merkle_tree_root: {self.merkle_tree_root}')
-        print(f'timestamp: {self.timestamp}')
             
 
 class BlockChain:
