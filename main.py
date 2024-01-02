@@ -1,3 +1,6 @@
+# Created by Ostapenko Artem
+# GitHub account https://github.com/Krahjotdaan
+# This repository licensed as Open Source under MIT License
 from blockchain import *
 
 
@@ -13,13 +16,13 @@ def main():
 
     blockchain.new_transaction(
         sender="0", 
-        recipient="Quincy Larson",  
+        recipient="Somebody",  
         quantity=1,  
     )
 
     block = blockchain.construct_block(nonce, last_block.hash)
 
-    print("***Mining was successful***")
+    print("Mining was successful")
     print(blockchain.blockchain)
 
 
